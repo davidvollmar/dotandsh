@@ -1,5 +1,10 @@
 #!/bin/sh
 # Diff *.pacnew configuration files with their originals
+# by using a graphical tool for merging, in this case p4merge.
+# This is setup for default use in KDE, so change $sudotool 
+# to the representative graphical sudo tool for your DE
+
+# based on https://wiki.archlinux.org/index.php/Pacnew_and_Pacsave_files#Using_a_graphics_diff._editor
 
 diffed="p4merge"
 sudotool="kdesu"
