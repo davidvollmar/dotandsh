@@ -1,0 +1,35 @@
+#!/bin/sh
+# Diff *.pacnew configuration files with their originals
+
+diffed="p4merge"
+sudotool="kdesu"
+[ $(whoami) = root ] && diffed="vimdiff"
+
+# Required programs
+req_prgs=("$diffed" vimdiff "$sudotool" sudo)
+for prog in ${req_prgs[@]}; do
+  if ! hash "$prog" 2>&- ; then
+    echo >&2 ""${0##*/}": requires program: "$prog""
+    error=y ;fi ; done
+[ "$error" = y ] && exit 1
+
+pacnew=$(sudo find /etc -type f -name "*.pacnew")
+if [ -z "$pacnew" ]; then
+  echo "No configurations to update"; fi
+
+for config in $pacnew; do
+  "$sudotool" "$diffed" ${config%\.*} $config ${config%\.*} &
+  wait
+  # Remove .pacnew file?
+  while true; do
+    read -p "Delete \""$config"\"? (Y/n): " Yn
+    case $Yn in
+      [Yy]* ) sudo rm "$config" && \
+              echo "Deleted \""$config"\"."
+              break                         ;;
+      [Nn]* ) break                         ;;
+      *     ) echo "Answer (Y)es or (n)o."  ;;
+    esac; done; done
+
+# Alert of pacsave files
+sudo find /etc -name "*.pacsave"
